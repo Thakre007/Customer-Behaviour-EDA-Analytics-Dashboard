@@ -1,0 +1,561 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--card:#fff;--border:#e8e5e0;--text:#1a1917;--muted:#6b6861;
+  --accent:#2d5be3;--accent2:#e8593c;--accent3:#1d9e75;--accent4:#ba7517;
+  --purple:#534ab7;--pink:#d4537e;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:0;min-height:100vh}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 16px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.topbar h1{font-size:20px;font-weight:600;letter-spacing:-0.5px}
+.topbar .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.badge{background:#edf2ff;color:var(--accent);font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;font-family:'DM Mono',monospace}
+
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--border);padding:3px;border-radius:10px;width:fit-content}
+.tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s}
+.tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:600;letter-spacing:-1px;line-height:1}
+.kpi-sub{font-size:11px;margin-top:5px}
+.kpi-sub.up{color:var(--accent3)} .kpi-sub.down{color:var(--accent2)} .kpi-sub.warn{color:var(--accent4)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card-title{font-size:13px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card-title span{font-size:10px;color:var(--muted);font-weight:400;background:var(--bg);padding:2px 7px;border-radius:99px;border:1px solid var(--border)}
+
+.chart-wrap{position:relative;width:100%}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+.hbar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.hbar-label{font-size:12px;color:var(--muted);width:80px;text-align:right;flex-shrink:0}
+.hbar-track{flex:1;background:#f0ede8;border-radius:99px;height:8px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:99px;transition:width .8s ease}
+.hbar-val{font-size:11px;font-weight:500;width:48px;color:var(--text);font-family:'DM Mono',monospace}
+
+.seg-row{display:flex;flex-direction:column;gap:8px}
+.seg-item{display:flex;align-items:center;gap:10px}
+.seg-name{font-size:12px;width:70px;flex-shrink:0}
+.seg-bar{flex:1;height:10px;background:#f0ede8;border-radius:99px;overflow:hidden}
+.seg-inner{height:100%;border-radius:99px}
+.seg-val{font-size:11px;color:var(--muted);width:40px;text-align:right;font-family:'DM Mono',monospace}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-box{background:var(--bg);border-radius:8px;padding:10px 12px}
+.stat-key{font-size:10px;color:var(--muted);margin-bottom:2px}
+.stat-v{font-size:16px;font-weight:600}
+
+.insight-list{display:flex;flex-direction:column;gap:8px}
+.insight{padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.5;border-left:3px solid}
+.insight.warn{background:#fff8f0;border-color:var(--accent4);color:#6b4a0a}
+.insight.danger{background:#fff0ed;border-color:var(--accent2);color:#7a2c16}
+.insight.good{background:#f0faf5;border-color:var(--accent3);color:#1a5c3a}
+.insight.info{background:#edf2ff;border-color:var(--accent);color:#1e3a8a}
+
+.pipeline{display:flex;flex-direction:column;gap:6px}
+.pipe-step{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:var(--bg)}
+.pipe-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.pipe-text{flex:1}
+.pipe-name{font-size:12px;font-weight:500}
+.pipe-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.pipe-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
+
+.tab-content{display:none}.tab-content.active{display:block}
+
+.sql-block{background:#1e1e2e;border-radius:10px;padding:16px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.8;color:#cdd6f4;overflow-x:auto}
+.sql-block .kw{color:#89b4fa} .sql-block .fn{color:#a6e3a1} .sql-block .str{color:#f38ba8} .sql-block .cm{color:#585b70;font-style:italic}
+.sql-block .num{color:#fab387}
+
+.py-block{background:#0d1117;border-radius:10px;padding:16px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.8;color:#e6edf3;overflow-x:auto;margin-bottom:12px}
+.py-block .kw{color:#ff7b72} .py-block .fn{color:#d2a8ff} .py-block .str{color:#a5d6ff} .py-block .cm{color:#8b949e;font-style:italic} .py-block .dec{color:#f0883e}
+
+.tool-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tool-chip{padding:5px 12px;border-radius:99px;font-size:11px;font-weight:500;border:1px solid}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Customer Analytics — EDA Project</h1>
+      <div class="sub">198 customers · Retail dataset · FY 2020–2024</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge">Excel</span><span class="badge">SQL</span>
+      <span class="badge">Python</span><span class="badge">Power BI</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab" onclick="switchTab('sql')">SQL Queries</button>
+    <button class="tab" onclick="switchTab('python')">Python EDA</button>
+    <button class="tab" onclick="switchTab('pipeline')">Data Pipeline</button>
+  </div>
+
+  <!-- DASHBOARD TAB -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Total Customers</div>
+        <div class="kpi-val">198</div>
+        <div class="kpi-sub up">↑ After cleaning 200 raw</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Avg Purchase</div>
+        <div class="kpi-val">₹11.2K</div>
+        <div class="kpi-sub warn">⚠ High variance (σ=20K)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Churn Rate</div>
+        <div class="kpi-val" style="color:var(--accent2)">43.4%</div>
+        <div class="kpi-sub down">↑ Dangerously high</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Avg CLV</div>
+        <div class="kpi-val">₹43.7K</div>
+        <div class="kpi-sub up">↑ Strong lifetime value</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card" style="grid-column:1/2">
+        <div class="card-title">Monthly Revenue Trend <span>2024</span></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="lineChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Churn by Segment <span>% churned</span></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="churnChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="card-title">Revenue by Channel</div>
+        <div class="chart-wrap" style="height:180px"><canvas id="chanChart"></canvas></div>
+        <div class="legend" style="margin-top:8px">
+          <div class="leg-item"><div class="leg-dot" style="background:#2d5be3"></div>Online ₹7.5L</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#1d9e75"></div>Mobile ₹6.3L</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#ba7517"></div>Offline ₹5.3L</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#e8e5e0"></div>Unknown ₹3.2L</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Satisfaction Ratings</div>
+        <div class="chart-wrap" style="height:180px"><canvas id="ratingChart"></canvas></div>
+        <div class="legend" style="margin-top:8px">
+          <div class="leg-item"><div class="leg-dot" style="background:#e8593c"></div>1★ 41 customers</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#ba7517"></div>2★ 27</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#888780"></div>3★ 66</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#1d9e75"></div>4★ 20 · 5★ 44</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Customers by Segment</div>
+        <div class="chart-wrap" style="height:180px"><canvas id="segChart"></canvas></div>
+        <div class="legend" style="margin-top:8px">
+          <div class="leg-item"><div class="leg-dot" style="background:#534ab7"></div>Premium 66</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#2d5be3"></div>Standard 64</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#1d9e75"></div>Basic 47</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#d4537e"></div>VIP 21</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Top Cities by Revenue <span>₹ total</span></div>
+        <div style="margin-top:4px">
+          <div class="hbar-row"><div class="hbar-label">Mumbai</div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:#2d5be3"></div></div><div class="hbar-val">₹3.6L</div></div>
+          <div class="hbar-row"><div class="hbar-label">Delhi</div><div class="hbar-track"><div class="hbar-fill" style="width:97%;background:#534ab7"></div></div><div class="hbar-val">₹3.5L</div></div>
+          <div class="hbar-row"><div class="hbar-label">Bangalore</div><div class="hbar-track"><div class="hbar-fill" style="width:76%;background:#1d9e75"></div></div><div class="hbar-val">₹2.8L</div></div>
+          <div class="hbar-row"><div class="hbar-label">Surat</div><div class="hbar-track"><div class="hbar-fill" style="width:70%;background:#ba7517"></div></div><div class="hbar-val">₹2.5L</div></div>
+          <div class="hbar-row"><div class="hbar-label">Chennai</div><div class="hbar-track"><div class="hbar-fill" style="width:38%;background:#e8593c"></div></div><div class="hbar-val">₹1.4L</div></div>
+          <div class="hbar-row"><div class="hbar-label">Pune</div><div class="hbar-track"><div class="hbar-fill" style="width:35%;background:#d4537e"></div></div><div class="hbar-val">₹1.3L</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Avg Spend by Age Group <span>₹ mean</span></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="ageChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Gender Churn Analysis</div>
+        <div class="chart-wrap" style="height:180px"><canvas id="genderChart"></canvas></div>
+        <div class="legend" style="margin-top:8px">
+          <div class="leg-item"><div class="leg-dot" style="background:#2d5be3"></div>No churn</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#e8593c"></div>Churned</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Key Business Insights</div>
+        <div class="insight-list">
+          <div class="insight danger">Churn rate is 43.4% — nearly half the customer base lost. Retention campaigns critical, especially for Female customers (52% churn rate).</div>
+          <div class="insight warn">26–35 age group spends highest avg ₹13.9K but is the smallest segment (27 customers). Growth opportunity here.</div>
+          <div class="insight good">Online channel drives ₹7.5L (34% of total revenue). Mobile growing — invest in app experience.</div>
+          <div class="insight info">Premium & VIP avg CLV ≈ ₹45K vs Basic ₹44K — segment differentiation is weak. Revisit loyalty perks.</div>
+          <div class="insight warn">3★ rating is most common (66 customers). Only 32% give 4–5★. Customer satisfaction needs attention.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Data Quality Summary <span>Before vs After Cleaning</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div class="stat-box"><div class="stat-key">Raw Records</div><div class="stat-v">200</div></div>
+        <div class="stat-box"><div class="stat-key">After Cleaning</div><div class="stat-v" style="color:var(--accent3)">198</div></div>
+        <div class="stat-box"><div class="stat-key">Missing Cells Fixed</div><div class="stat-v" style="color:var(--accent4)">~130</div></div>
+        <div class="stat-box"><div class="stat-key">Columns Standardized</div><div class="stat-v" style="color:var(--accent)">9 / 13</div></div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500">ISSUES BY COLUMN</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          <div class="seg-item"><div class="seg-name" style="font-size:11px">Age</div><div class="seg-bar"><div class="seg-inner" style="width:80%;background:#e8593c"></div></div><div class="seg-val">8%</div></div>
+          <div class="seg-item"><div class="seg-name" style="font-size:11px">Amount</div><div class="seg-bar"><div class="seg-inner" style="width:70%;background:#ba7517"></div></div><div class="seg-val">7%</div></div>
+          <div class="seg-item"><div class="seg-name" style="font-size:11px">Churn</div><div class="seg-bar"><div class="seg-inner" style="width:50%;background:#ba7517"></div></div><div class="seg-val">5%</div></div>
+          <div class="seg-item"><div class="seg-name" style="font-size:11px">Gender</div><div class="seg-bar"><div class="seg-inner" style="width:100%;background:#534ab7"></div></div><div class="seg-val">20%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SQL TAB -->
+  <div class="tab-content" id="tab-sql">
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">SQL — Database Setup & Loading</div>
+      <div class="sql-block"><span class="cm">-- Step 1: Create schema</span><br>
+<span class="kw">CREATE TABLE</span> customers (<br>
+&nbsp;&nbsp;customer_id &nbsp;&nbsp;&nbsp;INT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">PRIMARY KEY</span>,<br>
+&nbsp;&nbsp;customer_name VARCHAR(<span class="num">100</span>),<br>
+&nbsp;&nbsp;age &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">CHECK</span>(age <span class="kw">BETWEEN</span> <span class="num">18</span> <span class="kw">AND</span> <span class="num">100</span>),<br>
+&nbsp;&nbsp;gender &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VARCHAR(<span class="num">10</span>),<br>
+&nbsp;&nbsp;city &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VARCHAR(<span class="num">50</span>),<br>
+&nbsp;&nbsp;segment &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VARCHAR(<span class="num">20</span>),<br>
+&nbsp;&nbsp;purchase_channel VARCHAR(<span class="num">20</span>),<br>
+&nbsp;&nbsp;purchase_amount DECIMAL(<span class="num">10</span>,<span class="num">2</span>),<br>
+&nbsp;&nbsp;purchase_date &nbsp;DATE,<br>
+&nbsp;&nbsp;purchase_freq &nbsp;INT,<br>
+&nbsp;&nbsp;satisfaction &nbsp;INT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">CHECK</span>(satisfaction <span class="kw">BETWEEN</span> <span class="num">1</span> <span class="kw">AND</span> <span class="num">5</span>),<br>
+&nbsp;&nbsp;clv &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECIMAL(<span class="num">12</span>,<span class="num">2</span>),<br>
+&nbsp;&nbsp;churn &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VARCHAR(<span class="num">3</span>)<br>
+);</div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Churn Analysis by Segment</div>
+        <div class="sql-block"><span class="kw">SELECT</span><br>
+&nbsp;&nbsp;segment,<br>
+&nbsp;&nbsp;<span class="fn">COUNT</span>(*) <span class="kw">AS</span> total,<br>
+&nbsp;&nbsp;<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> churn=<span class="str">'Yes'</span> <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>) <span class="kw">AS</span> churned,<br>
+&nbsp;&nbsp;<span class="fn">ROUND</span>(<span class="fn">AVG</span>(<span class="kw">CASE WHEN</span> churn=<span class="str">'Yes'</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">THEN</span> <span class="num">1.0</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>)*<span class="num">100</span>,<span class="num">1</span>) <span class="kw">AS</span> churn_pct,<br>
+&nbsp;&nbsp;<span class="fn">ROUND</span>(<span class="fn">AVG</span>(clv),<span class="num">0</span>) <span class="kw">AS</span> avg_clv<br>
+<span class="kw">FROM</span> customers<br>
+<span class="kw">GROUP BY</span> segment<br>
+<span class="kw">ORDER BY</span> churn_pct <span class="kw">DESC</span>;</div>
+      </div>
+      <div class="card">
+        <div class="card-title">RFM Scoring (Recency / Frequency / Monetary)</div>
+        <div class="sql-block"><span class="kw">WITH</span> rfm <span class="kw">AS</span> (<br>
+&nbsp;&nbsp;<span class="kw">SELECT</span> customer_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">DATEDIFF</span>(<span class="fn">CURDATE</span>(), <span class="fn">MAX</span>(purchase_date)) <span class="kw">AS</span> recency,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">COUNT</span>(*) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">AS</span> frequency,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>(purchase_amount) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">AS</span> monetary<br>
+&nbsp;&nbsp;<span class="kw">FROM</span> customers<br>
+&nbsp;&nbsp;<span class="kw">GROUP BY</span> customer_id<br>
+)<br>
+<span class="kw">SELECT</span> *,<br>
+&nbsp;&nbsp;<span class="fn">NTILE</span>(<span class="num">5</span>) <span class="kw">OVER</span>(<span class="kw">ORDER BY</span> recency <span class="kw">DESC</span>)  <span class="kw">AS</span> r_score,<br>
+&nbsp;&nbsp;<span class="fn">NTILE</span>(<span class="num">5</span>) <span class="kw">OVER</span>(<span class="kw">ORDER BY</span> frequency)     <span class="kw">AS</span> f_score,<br>
+&nbsp;&nbsp;<span class="fn">NTILE</span>(<span class="num">5</span>) <span class="kw">OVER</span>(<span class="kw">ORDER BY</span> monetary)      <span class="kw">AS</span> m_score<br>
+<span class="kw">FROM</span> rfm;</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Top 10 Customers by Revenue</div>
+        <div class="sql-block"><span class="kw">SELECT</span><br>
+&nbsp;&nbsp;customer_id, customer_name,<br>
+&nbsp;&nbsp;<span class="fn">SUM</span>(purchase_amount) <span class="kw">AS</span> total_revenue,<br>
+&nbsp;&nbsp;<span class="fn">COUNT</span>(*) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">AS</span> transactions,<br>
+&nbsp;&nbsp;<span class="fn">ROUND</span>(<span class="fn">AVG</span>(satisfaction),<span class="num">1</span>) <span class="kw">AS</span> avg_rating,<br>
+&nbsp;&nbsp;churn<br>
+<span class="kw">FROM</span> customers<br>
+<span class="kw">GROUP BY</span> customer_id, customer_name, churn<br>
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span><br>
+<span class="kw">LIMIT</span> <span class="num">10</span>;</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Monthly Revenue Cohort</div>
+        <div class="sql-block"><span class="kw">SELECT</span><br>
+&nbsp;&nbsp;<span class="fn">DATE_FORMAT</span>(purchase_date, <span class="str">'%Y-%m'</span>) <span class="kw">AS</span> month,<br>
+&nbsp;&nbsp;city,<br>
+&nbsp;&nbsp;<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> customer_id) <span class="kw">AS</span> customers,<br>
+&nbsp;&nbsp;<span class="fn">SUM</span>(purchase_amount) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">AS</span> revenue,<br>
+&nbsp;&nbsp;<span class="fn">AVG</span>(purchase_amount) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">AS</span> avg_order<br>
+<span class="kw">FROM</span> customers<br>
+<span class="kw">WHERE</span> purchase_date &gt;= <span class="str">'2024-01-01'</span><br>
+<span class="kw">GROUP BY</span> <span class="fn">DATE_FORMAT</span>(purchase_date,<span class="str">'%Y-%m'</span>), city<br>
+<span class="kw">ORDER BY</span> month, revenue <span class="kw">DESC</span>;</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PYTHON TAB -->
+  <div class="tab-content" id="tab-python">
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Step 1 — Load & Inspect Raw Data</div>
+      <div class="py-block"><span class="kw">import</span> pandas <span class="kw">as</span> pd<br>
+<span class="kw">import</span> numpy <span class="kw">as</span> np<br>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt<br>
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns<br>
+<br>
+df = pd.<span class="fn">read_excel</span>(<span class="str">'Customer_EDA_Raw_Data.xlsx'</span>, sheet_name=<span class="str">'Raw_Customer_Data'</span>)<br>
+<span class="cm"># Quick profiling</span><br>
+<span class="fn">print</span>(df.<span class="fn">info</span>())<br>
+<span class="fn">print</span>(df.<span class="fn">isnull</span>().<span class="fn">sum</span>().<span class="fn">sort_values</span>(ascending=<span class="kw">False</span>))<br>
+<span class="fn">print</span>(df.<span class="fn">describe</span>())</div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Step 2 — Data Cleaning Pipeline</div>
+      <div class="py-block"><span class="cm"># Remove duplicates & invalid IDs</span><br>
+df = df.<span class="fn">dropna</span>(subset=[<span class="str">'Customer_ID'</span>]).<span class="fn">drop_duplicates</span>(subset=[<span class="str">'Customer_ID'</span>])<br>
+<br>
+<span class="cm"># Standardize Gender</span><br>
+df[<span class="str">'Gender'</span>] = (df[<span class="str">'Gender'</span>].<span class="fn">astype</span>(<span class="str">str</span>).<span class="fn">str</span>.<span class="fn">upper</span>()<br>
+&nbsp;&nbsp;.<span class="fn">map</span>({<span class="str">'M'</span>:<span class="str">'Male'</span>,<span class="str">'MALE'</span>:<span class="str">'Male'</span>,<span class="str">'F'</span>:<span class="str">'Female'</span>,<span class="str">'FEMALE'</span>:<span class="str">'Female'</span>})<br>
+&nbsp;&nbsp;.<span class="fn">fillna</span>(<span class="str">'Unknown'</span>))<br>
+<br>
+<span class="cm"># Fix Age outliers using IQR</span><br>
+Q1, Q3 = df[<span class="str">'Age'</span>].<span class="fn">quantile</span>([<span class="dec">0.25</span>, <span class="dec">0.75</span>])<br>
+df[<span class="str">'Age'</span>] = df[<span class="str">'Age'</span>].<span class="fn">clip</span>(<span class="dec">18</span>, <span class="dec">100</span>).<span class="fn">fillna</span>(df[<span class="str">'Age'</span>].<span class="fn">median</span>())<br>
+<br>
+<span class="cm"># Standardize all text columns</span><br>
+<span class="kw">for</span> col <span class="kw">in</span> [<span class="str">'City'</span>,<span class="str">'Segment'</span>,<span class="str">'Purchase_Channel'</span>]:<br>
+&nbsp;&nbsp;df[col] = df[col].<span class="fn">fillna</span>(<span class="str">'Unknown'</span>).<span class="fn">str</span>.<span class="fn">title</span>().<span class="fn">str</span>.<span class="fn">strip</span>()<br>
+<br>
+<span class="cm"># Standardize Churn to Yes/No</span><br>
+df[<span class="str">'Churn'</span>] = (df[<span class="str">'Churn'</span>].<span class="fn">astype</span>(<span class="str">str</span>).<span class="fn">str</span>.<span class="fn">upper</span>()<br>
+&nbsp;&nbsp;.<span class="fn">map</span>({<span class="str">'YES'</span>:<span class="str">'Yes'</span>,<span class="str">'1'</span>:<span class="str">'Yes'</span>,<span class="str">'NO'</span>:<span class="str">'No'</span>,<span class="str">'0'</span>:<span class="str">'No'</span>}).<span class="fn">fillna</span>(<span class="str">'No'</span>))</div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Step 3 — EDA Visualizations</div>
+        <div class="py-block" style="font-size:10px"><span class="cm"># 1. Churn distribution</span><br>
+df[<span class="str">'Churn'</span>].<span class="fn">value_counts</span>().<span class="fn">plot</span>(kind=<span class="str">'bar'</span>)<br>
+plt.<span class="fn">title</span>(<span class="str">'Churn Distribution'</span>); plt.<span class="fn">show</span>()<br>
+<br>
+<span class="cm"># 2. Correlation heatmap</span><br>
+num = df.<span class="fn">select_dtypes</span>(include=<span class="str">'number'</span>)<br>
+sns.<span class="fn">heatmap</span>(num.<span class="fn">corr</span>(), annot=<span class="kw">True</span>, cmap=<span class="str">'coolwarm'</span>)<br>
+<br>
+<span class="cm"># 3. Purchase amount distribution</span><br>
+sns.<span class="fn">histplot</span>(df[<span class="str">'Purchase_Amount'</span>], bins=<span class="dec">30</span>, kde=<span class="kw">True</span>)<br>
+<br>
+<span class="cm"># 4. Boxplot — CLV by Segment</span><br>
+sns.<span class="fn">boxplot</span>(data=df, x=<span class="str">'Segment'</span>, y=<span class="str">'Customer_Lifetime_Value'</span>)<br>
+<br>
+<span class="cm"># 5. Churn rate by channel</span><br>
+churn_ch = df.<span class="fn">groupby</span>([<span class="str">'Purchase_Channel'</span>,<span class="str">'Churn'</span>]).<span class="fn">size</span>().<span class="fn">unstack</span>()<br>
+churn_ch.<span class="fn">div</span>(churn_ch.<span class="fn">sum</span>(axis=<span class="dec">1</span>), axis=<span class="dec">0</span>).<span class="fn">plot</span>(kind=<span class="str">'bar'</span>, stacked=<span class="kw">True</span>)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 4 — Churn Prediction (ML)</div>
+        <div class="py-block" style="font-size:10px"><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier<br>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split<br>
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report<br>
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> LabelEncoder<br>
+<br>
+<span class="cm"># Encode categoricals</span><br>
+le = LabelEncoder()<br>
+df_ml = df.<span class="fn">copy</span>()<br>
+<span class="kw">for</span> col <span class="kw">in</span> [<span class="str">'Gender'</span>,<span class="str">'City'</span>,<span class="str">'Segment'</span>,<span class="str">'Purchase_Channel'</span>]:<br>
+&nbsp;&nbsp;df_ml[col] = le.<span class="fn">fit_transform</span>(df_ml[col].<span class="fn">astype</span>(<span class="str">str</span>))<br>
+<br>
+features = [<span class="str">'Age'</span>,<span class="str">'Purchase_Amount'</span>,<span class="str">'Purchase_Frequency'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">'Satisfaction_Rating'</span>,<span class="str">'Customer_Lifetime_Value'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">'Gender'</span>,<span class="str">'Segment'</span>,<span class="str">'Purchase_Channel'</span>]<br>
+X = df_ml[features]<br>
+y = (df_ml[<span class="str">'Churn'</span>]==<span class="str">'Yes'</span>).<span class="fn">astype</span>(<span class="str">int</span>)<br>
+<br>
+X_tr,X_te,y_tr,y_te = <span class="fn">train_test_split</span>(X,y,test_size=<span class="dec">0.2</span>,random_state=<span class="dec">42</span>)<br>
+rf = <span class="fn">RandomForestClassifier</span>(n_estimators=<span class="dec">100</span>, random_state=<span class="dec">42</span>)<br>
+rf.<span class="fn">fit</span>(X_tr, y_tr)<br>
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_te, rf.<span class="fn">predict</span>(X_te)))</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIPELINE TAB -->
+  <div class="tab-content" id="tab-pipeline">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">End-to-End Data Pipeline</div>
+        <div class="pipeline">
+          <div class="pipe-step">
+            <div class="pipe-icon" style="background:#edf2ff;color:#2d5be3">📊</div>
+            <div class="pipe-text"><div class="pipe-name">Excel — Raw Data Source</div><div class="pipe-desc">200 rows, 13 columns · messy, uneven, missing values</div></div>
+            <span class="pipe-badge" style="background:#edf2ff;color:#2d5be3">Step 1</span>
+          </div>
+          <div style="padding-left:22px;font-size:10px;color:var(--muted);margin:-2px 0">↓ Load into Python / SQL</div>
+          <div class="pipe-step">
+            <div class="pipe-icon" style="background:#fff8f0;color:#ba7517">🐍</div>
+            <div class="pipe-text"><div class="pipe-name">Python — Data Cleaning</div><div class="pipe-desc">Pandas: dedup, impute, standardize, outlier removal</div></div>
+            <span class="pipe-badge" style="background:#fff8f0;color:#ba7517">Step 2</span>
+          </div>
+          <div style="padding-left:22px;font-size:10px;color:var(--muted);margin:-2px 0">↓ Load cleaned CSV into SQL</div>
+          <div class="pipe-step">
+            <div class="pipe-icon" style="background:#f0faf5;color:#1d9e75">🗄</div>
+            <div class="pipe-text"><div class="pipe-name">SQL — Aggregations & RFM</div><div class="pipe-desc">Segment analysis, cohort queries, churn metrics</div></div>
+            <span class="pipe-badge" style="background:#f0faf5;color:#1d9e75">Step 3</span>
+          </div>
+          <div style="padding-left:22px;font-size:10px;color:var(--muted);margin:-2px 0">↓ Connect Power BI to SQL view</div>
+          <div class="pipe-step">
+            <div class="pipe-icon" style="background:#fbeaf0;color:#d4537e">📈</div>
+            <div class="pipe-text"><div class="pipe-name">Power BI — Dashboard</div><div class="pipe-desc">KPI cards, bar/line charts, slicers, drill-through</div></div>
+            <span class="pipe-badge" style="background:#fbeaf0;color:#d4537e">Step 4</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Power BI — DAX Measures</div>
+        <div style="background:#1e1e2e;border-radius:10px;padding:14px;font-family:'DM Mono',monospace;font-size:11px;line-height:2;color:#cdd6f4">
+          <span style="color:#f38ba8">Churn Rate</span> =<br>
+&nbsp;&nbsp;<span style="color:#89b4fa">DIVIDE</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#89b4fa">COUNTROWS</span>(<span style="color:#a6e3a1">FILTER</span>(customers, customers[Churn]="Yes")),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#89b4fa">COUNTROWS</span>(customers)<br>
+&nbsp;&nbsp;)<br><br>
+<span style="color:#f38ba8">Avg CLV by Segment</span> =<br>
+&nbsp;&nbsp;<span style="color:#89b4fa">AVERAGEX</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a6e3a1">VALUES</span>(customers[Segment]),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#89b4fa">AVERAGE</span>(customers[Customer_Lifetime_Value])<br>
+&nbsp;&nbsp;)<br><br>
+<span style="color:#f38ba8">Revenue MoM %</span> =<br>
+&nbsp;&nbsp;<span style="color:#89b4fa">DIVIDE</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Total Revenue] - <span style="color:#89b4fa">CALCULATE</span>([Total Revenue], <span style="color:#89b4fa">PREVIOUSMONTH</span>(dates[Date])),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#89b4fa">CALCULATE</span>([Total Revenue], <span style="color:#89b4fa">PREVIOUSMONTH</span>(dates[Date]))<br>
+&nbsp;&nbsp;)
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Power BI Dashboard Design Guide <span>Recommended visuals</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="stat-box"><div class="stat-key">Page 1 — Overview</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6">4 KPI Cards · Revenue Line · Churn Donut · Segment Bar</div></div>
+        <div class="stat-box"><div class="stat-key">Page 2 — Customer Deep Dive</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6">Age scatter · CLV box · City map · RFM matrix table</div></div>
+        <div class="stat-box"><div class="stat-key">Page 3 — Churn Analysis</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6">Churn by Gender, Channel, Segment · Waterfall · Slicer by city</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function switchTab(name){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+const palette={blue:'#2d5be3',coral:'#e8593c',green:'#1d9e75',amber:'#ba7517',purple:'#534ab7',pink:'#d4537e',teal:'#0f6e56',gray:'#888780'};
+
+const opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0ede8'},ticks:{font:{size:11}}}}};
+
+new Chart(document.getElementById('lineChart'),{
+  type:'line',
+  data:{
+    labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets:[{
+      label:'Revenue',
+      data:[37998,69100,150869,37281,7771,20902,37720,21546,11606,3499,27854,63582],
+      borderColor:palette.blue,backgroundColor:'rgba(45,91,227,0.08)',
+      borderWidth:2,pointRadius:3,fill:true,tension:0.4
+    }]
+  },
+  options:{...opts,plugins:{legend:{display:false}}}
+});
+
+new Chart(document.getElementById('churnChart'),{
+  type:'bar',
+  data:{
+    labels:['Premium','Standard','Basic','VIP'],
+    datasets:[{
+      label:'Churn %',
+      data:[45.5,43.8,40.4,42.9],
+      backgroundColor:[palette.coral,palette.amber,palette.blue,palette.purple],
+      borderRadius:6,barThickness:32
+    }]
+  },
+  options:{...opts,scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{max:60,grid:{color:'#f0ede8'},ticks:{callback:v=>v+'%',font:{size:11}}}}}
+});
+
+new Chart(document.getElementById('chanChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Online','Mobile','Offline','Unknown'],
+    datasets:[{data:[749037,625514,527443,322908],backgroundColor:[palette.blue,palette.green,palette.amber,'#e8e5e0'],hoverOffset:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'}
+});
+
+new Chart(document.getElementById('ratingChart'),{
+  type:'bar',
+  data:{
+    labels:['1★','2★','3★','4★','5★'],
+    datasets:[{
+      data:[41,27,66,20,44],
+      backgroundColor:[palette.coral,palette.amber,palette.gray,palette.green,'#1d9e75'],
+      borderRadius:5,barThickness:28
+    }]
+  },
+  options:{...opts,plugins:{legend:{display:false}}}
+});
+
+new Chart(document.getElementById('segChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Premium','Standard','Basic','VIP'],
+    datasets:[{data:[66,64,47,21],backgroundColor:[palette.purple,palette.blue,palette.green,palette.pink],hoverOffset:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'}
+});
+
+new Chart(document.getElementById('ageChart'),{
+  type:'bar',
+  data:{
+    labels:['18–25','26–35','36–45','46–55','55+'],
+    datasets:[{
+      label:'Avg Spend ₹',
+      data:[12516,13924,12921,9209,10244],
+      backgroundColor:[palette.teal,palette.blue,palette.purple,palette.amber,palette.coral],
+      borderRadius:6,barThickness:30
+    }]
+  },
+  options:{...opts,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f0ede8'},ticks:{callback:v=>'₹'+(v/1000).toFixed(0)+'K',font:{size:11}}}}}
+});
+
+new Chart(document.getElementById('genderChart'),{
+  type:'bar',
+  data:{
+    labels:['Female','Male','Unknown'],
+    datasets:[
+      {label:'No churn',data:[36,53,23],backgroundColor:palette.blue,borderRadius:4,barThickness:22},
+      {label:'Churned',data:[39,31,16],backgroundColor:palette.coral,borderRadius:4,barThickness:22}
+    ]
+  },
+  options:{...opts,plugins:{legend:{display:false}},scales:{x:{stacked:false,grid:{display:false},ticks:{font:{size:11}}},y:{stacked:false,grid:{color:'#f0ede8'},ticks:{font:{size:11}}}}}
+});
+</script>
